@@ -8,20 +8,33 @@ export const Contact = () => {
         Email: '',
         Message: ''
     }
-    const [fromDetails, setFormDetails] = useState(initialDetails)
-    const [buttonText, setButtonText] = useState('Send');
+    const [formDetails, setFormDetails] = useState(initialDetails)
     const [status, setStatus] = useState({});
 
     const onFormUpdate = (field, value) =>{
         setFormDetails({
-            ...fromDetails,
+            ...formDetails,
             [field]: value
         })
     }
 
-    const handleSubmit = () => {
-        
-    }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        let response = await fetch("http://localhost:5000/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json;charset=utf-8",
+          },
+          body: JSON.stringify(formDetails),
+        });
+        let result = await response.json();
+        setFormDetails(initialDetails);
+        if (result.code == 200) {
+          setStatus({ succes: true, message: 'Message sent successfully'});
+        } else {
+          setStatus({ succes: false, message: 'Something went wrong, please try again later.'});
+        }
+      };
 
     return(
         <section>
@@ -34,15 +47,15 @@ export const Contact = () => {
                         <Row>
                             <Col>
                             <label>Name</label><br></br>
-                            <input type="text" value={fromDetails.Name} onChange={(e) =>onFormUpdate('Name', e.target.value)}/>
+                            <input type="text" value={formDetails.Name} onChange={(e) =>onFormUpdate('Name', e.target.value)}/>
                             </Col>
                             <Col>
                             <label>Email</label><br></br>
-                            <input type="email" value={fromDetails.Email} onChange={(e) =>onFormUpdate('Email', e.target.value)}/>
+                            <input type="email" value={formDetails.Email} onChange={(e) =>onFormUpdate('Email', e.target.value)}/>
                             </Col>
                             <Col>
                             <label>Message</label><br></br>
-                            <textarea row="6" value={fromDetails.Email} onChange={(e) =>onFormUpdate('Message', e.target.value)}/>
+                            <textarea value={formDetails.Message} onChange={(e) =>onFormUpdate('Message', e.target.value)}/>
                             </Col>
                             <Col>
                             <button type="submit"><span>Send</span></button> 
